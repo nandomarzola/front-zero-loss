@@ -1,0 +1,73 @@
+<div class="profile-page">
+  <div class="profile-card">
+    <div class="card-header">
+      <h2>Dados do Perfil</h2>
+      <p>Gerencie as informações da sua conta Shopee no Zero Loss</p>
+    </div>
+
+    <form class="profile-form" (ngSubmit)="saveProfile()">
+      <div class="form-section">
+        <h3>Informações Gerais</h3>
+        <div class="input-grid">
+          <div class="input-field">
+            <label>Nome da Conta</label>
+            <input type="text" [(ngModel)]="userData.storeName" name="storeName" readonly class="disabled">
+          </div>
+          <div class="input-field">
+            <label>Ativo desde</label>
+            <input type="text" [(ngModel)]="userData.activeSince" name="activeSince" readonly class="disabled">
+          </div>
+          <div class="input-field">
+            <label>CNPJ</label>
+            <input type="text" [(ngModel)]="userData.cnpj" name="cnpj" readonly class="disabled">
+          </div>
+          <div class="input-field">
+            <label>Nome do Responsável</label>
+            <input type="text" [(ngModel)]="userData.responsibleName" name="responsibleName">
+          </div>
+        </div>
+      </div>
+
+      <hr class="separator">
+
+      <div class="form-section">
+        <h3>Segurança e Acesso</h3>
+        <div class="input-grid">
+            
+            <div class="input-field">
+            <label>Senha Atual</label>
+            <div class="password-wrapper">
+                <input 
+                [type]="showCurrentPassword ? 'text' : 'password'" 
+                [(ngModel)]="userData.currentPassword" 
+                name="currentPassword" 
+                placeholder="********">
+                <span class="toggle-icon" (click)="toggleCurrentPassword()">
+                {{ showCurrentPassword ? '👁️' : '🙈' }}
+                </span>
+            </div>
+            </div>
+
+            <div class="input-field">
+            <label>Nova Senha</label>
+            <div class="password-wrapper">
+                <input 
+                [type]="showNewPassword ? 'text' : 'password'" 
+                [(ngModel)]="userData.newPassword" 
+                name="newPassword" 
+                placeholder="Digite a nova senha">
+                <span class="toggle-icon" (click)="toggleNewPassword()">
+                {{ showNewPassword ? '👁️' : '🙈' }}
+                </span>
+            </div>
+            </div>
+
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Atualizar Dados</button>
+      </div>
+    </form>
+  </div>
+</div>

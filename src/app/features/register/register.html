@@ -1,0 +1,60 @@
+<div class="auth-container">
+  <div class="auth-box">
+    <div class="auth-header">
+      <span class="logo-icon">S</span>
+      <h1>Criar Conta Zero Loss</h1>
+      <p>Tenha o controle financeiro de sua loja na palma de sua mão.</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="form-section">
+        <div class="input-group">
+          <label>Nome do Responsável</label>
+          <input type="text" [(ngModel)]="userData.nomeResponsavel" name="nome" required placeholder="Ex: João Silva">
+        </div>
+
+        <div class="input-group">
+          <label>E-mail</label>
+          <input type="email" [(ngModel)]="userData.email" name="email" required placeholder="seu@email.com">
+        </div>
+
+        <div class="input-group">
+          <label>Senha</label>
+          <div class="password-wrapper">
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="userData.senha" name="senha" required placeholder="No mínimo 6 caracteres">
+            <span class="toggle-icon" (click)="togglePassword()">
+              {{ showPassword ? '👁️' : '🙈' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="input-group">
+          <label>Nome da Loja (Shopee)</label>
+          <input type="text" [(ngModel)]="userData.nomeLoja" name="loja" required placeholder="Ex: Minha Loja Oficial">
+        </div>
+
+        <div class="input-group">
+          <label>CNPJ</label>
+          <input type="text" [(ngModel)]="userData.cnpj" name="cnpj" placeholder="00.000.000/0001-00">
+        </div>
+      </div>
+
+      <div class="terms">
+        <label>
+          <input type="checkbox" [(ngModel)]="userData.termos" name="termos" required>
+          Aceito os termos e políticas do sistema.
+        </label>
+      </div>
+
+      <button type="submit" class="btn-register" [disabled]="!registerForm.valid">
+        Finalizar Cadastro
+      </button>
+
+      <div class="auth-footer">
+        Já tem uma conta? <a routerLink="/login">Fazer Login</a>
+      </div>
+    </form>
+  </div>
+</div>

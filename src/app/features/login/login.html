@@ -1,0 +1,54 @@
+<div class="auth-container">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="logo-icon">S</div>
+      <h1>Acessar Zero Loss</h1>
+      <p>Entre com suas credenciais para gerenciar sua loja.</p>
+    </div>
+
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+      <div class="input-group">
+        <label>E-mail</label>
+        <input 
+          type="email" 
+          [(ngModel)]="loginData.email" 
+          name="email" 
+          required 
+          placeholder="seu@email.com">
+      </div>
+
+      <div class="input-group">
+        <div class="label-wrapper">
+          <label>Senha</label>
+          <a routerLink="/forgot-password" class="forgot-link">Esqueceu a senha?</a>
+        </div>
+        <div class="password-wrapper">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            [(ngModel)]="loginData.senha" 
+            name="senha" 
+            required 
+            placeholder="Sua senha">
+          <span class="toggle-icon" (click)="togglePassword()">
+            {{ showPassword ? '👁️' : '🙈' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="remember-me">
+        <label>
+          <input type="checkbox" [(ngModel)]="loginData.lembrar" name="lembrar">
+          Lembrar de mim
+        </label>
+      </div>
+
+      <button type="submit" class="btn-login" [disabled]="!loginForm.valid">
+        Entrar no Painel
+      </button>
+
+      <div class="auth-footer">
+        Ainda não tem conta? <a routerLink="/register">Criar conta grátis</a>
+      </div>
+    </form>
+  </div>
+</div>

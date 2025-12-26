@@ -1,0 +1,70 @@
+<div class="analisador-container">
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Analisador Shopee</h1>
+      <p>Configure os custos para calcular o lucro real por produto.</p>
+    </div>
+    <div class="action-group">
+      <input type="file" (change)="uploadArquivo($event)" id="file" style="display:none">
+      <label for="file" class="btn-import">📁 Importar Planilha</label>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="card">
+      <label class="label-head">📊 Imposto s/ Venda (ICMS)</label>
+      <select [(ngModel)]="regimeSelecionado" (change)="recalcular()" class="input-base">
+        <option value="ISENTO">Isento / CPF / MEI (0%)</option>
+        <option value="VARIAVEL">Simples Nacional (%)</option>
+      </select>
+      <input *ngIf="regimeSelecionado === 'VARIAVEL'" type="number" [(ngModel)]="aliquotaInformada" (input)="recalcular()" class="input-base mt-2" placeholder="Digite a %">
+    </div>
+
+    <div class="card">
+      <label class="label-head">📦 Embalagem (Un)</label>
+      <input type="number" [(ngModel)]="custoEmbalagem" (input)="recalcular()" class="input-base big-font" placeholder="0,00">
+    </div>
+
+    <div class="card">
+      <label class="label-head">💰 Faturamento Bruto</label>
+      <div class="value-display">{{ totalBruto | currency:'BRL' }}</div>
+    </div>
+
+    <div class="card highlight">
+      <label class="label-head">💵 Lucro Líquido Real</label>
+      <div class="value-display white">{{ totalLucro | currency:'BRL' }}</div>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>PRODUTO / VARIAÇÃO</th>
+          <th class="text-center">QTD</th>
+          <th class="text-center">VENDA UNIT.</th>
+          <th class="text-center">CMV UNIT.</th>
+          <th class="text-center">LUCRO UNIT.</th>
+          <th class="text-right">LUCRO TOTAL</th>
+          <th class="text-center">MARGEM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of dadosProcessados()">
+          <td>
+            <div class="prod-title">{{ item.produto }}</div>
+            <div class="prod-sub">{{ item.variacao }}</div>
+          </td>
+          <td class="text-center bold">{{ item.quantidade }}</td>
+          <td class="text-center"><input type="number" [(ngModel)]="item.precoVendaUnitario" (input)="recalcular()" class="table-input blue"></td>
+          <td class="text-center"><input type="number" [(ngModel)]="item.cmvUnitario" (input)="aoMudarCMV(item)" class="table-input orange"></td>
+          <td class="text-center green bold">{{ item.lucroUnitario | currency:'BRL' }}</td>
+          <td class="text-right bold" [style.color]="item.lucroFinal >= 0 ? '#10b981' : '#ef4444'">{{ item.lucroFinal | currency:'BRL' }}</td>
+          <td class="text-center">
+            <span class="margin-badge" [style.background]="getMargemColor(item.margem)">{{ item.margem | number:'1.1-1' }}%</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
