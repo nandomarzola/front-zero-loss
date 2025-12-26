@@ -1,8 +1,8 @@
 <div class="profile-page">
   <div class="profile-card">
     <div class="card-header">
-      <h2>Dados do Perfil</h2>
-      <p>Gerencie as informações da sua conta Shopee no Zero Loss</p>
+      <h2>Dados da Loja</h2>
+      <p>Gerencie as informações da sua conta no Zero Loss</p>
     </div>
 
     <form class="profile-form" (ngSubmit)="saveProfile()">
@@ -10,20 +10,20 @@
         <h3>Informações Gerais</h3>
         <div class="input-grid">
           <div class="input-field">
-            <label>Nome da Conta</label>
-            <input type="text" [(ngModel)]="userData.storeName" name="storeName" readonly class="disabled">
+            <label>Nome da Loja</label>
+            <input type="text" [(ngModel)]="userData.storeName" name="storeName" readonly class="input-readonly">
           </div>
           <div class="input-field">
             <label>Ativo desde</label>
-            <input type="text" [(ngModel)]="userData.activeSince" name="activeSince" readonly class="disabled">
+            <input type="text" [(ngModel)]="userData.activeSince" name="activeSince" readonly class="input-readonly">
           </div>
           <div class="input-field">
             <label>CNPJ</label>
-            <input type="text" [(ngModel)]="userData.cnpj" name="cnpj" readonly class="disabled">
+            <input type="text" [(ngModel)]="userData.cnpj" name="cnpj" readonly class="input-readonly">
           </div>
           <div class="input-field">
             <label>Nome do Responsável</label>
-            <input type="text" [(ngModel)]="userData.responsibleName" name="responsibleName">
+            <input type="text" [(ngModel)]="userData.responsibleName" name="responsibleName" placeholder="Seu nome">
           </div>
         </div>
       </div>
@@ -33,35 +33,37 @@
       <div class="form-section">
         <h3>Segurança e Acesso</h3>
         <div class="input-grid">
-            
-            <div class="input-field">
+          <!-- <div class="input-field">
             <label>Senha Atual</label>
-            <div class="password-wrapper">
-                <input 
+            <div class="password-wrapper" style="position: relative;">
+              <input 
                 [type]="showCurrentPassword ? 'text' : 'password'" 
                 [(ngModel)]="userData.currentPassword" 
                 name="currentPassword" 
-                placeholder="********">
-                <span class="toggle-icon" (click)="toggleCurrentPassword()">
+                placeholder="********"
+                style="width: 100%; padding-right: 45px;"> <button 
+                type="button" 
+                class="toggle-icon-btn" 
+                (click)="toggleCurrentPassword()"
+                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none; cursor: pointer; font-size: 1.2rem;">
                 {{ showCurrentPassword ? '👁️' : '🙈' }}
-                </span>
+              </button>
             </div>
-            </div>
+          </div> -->
 
-            <div class="input-field">
+          <div class="input-field">
             <label>Nova Senha</label>
             <div class="password-wrapper">
-                <input 
+              <input 
                 [type]="showNewPassword ? 'text' : 'password'" 
                 [(ngModel)]="userData.newPassword" 
                 name="newPassword" 
                 placeholder="Digite a nova senha">
-                <span class="toggle-icon" (click)="toggleNewPassword()">
+              <span class="toggle-icon" (click)="toggleNewPassword()">
                 {{ showNewPassword ? '👁️' : '🙈' }}
-                </span>
+              </span>
             </div>
-            </div>
-
+          </div>
         </div>
       </div>
 

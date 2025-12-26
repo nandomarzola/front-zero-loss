@@ -1,7 +1,8 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,21 +13,33 @@ import { Router, RouterModule } from '@angular/router';
   encapsulation: ViewEncapsulation.None
 })
 export class Login {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   showPassword = false;
+  isLoading = signal(false);
   loginData = {
-    email: '',
+    identifier: '',
     senha: '',
     lembrar: false
   };
-
-  constructor(private router: Router) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
-  onLogin() {
-    console.log('Tentativa de login no Zero Loss:', this.loginData);
-    this.router.navigate(['/dashboard']);
+  async onLogin() {
+    this.isLoading.set(true);
+    try {
+      await this.authService.login({
+        identifier: this.loginData.identifier, 
+        password: this.loginData.senha
+      });
+      console.log('✅ Login realizado com sucesso!');
+    } catch (error: any) {
+      alert('Erro ao logar. Verifique suas credenciais.');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 }

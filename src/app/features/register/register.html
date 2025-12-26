@@ -48,8 +48,11 @@
         </label>
       </div>
 
-      <button type="submit" class="btn-register" [disabled]="!registerForm.valid">
-        Finalizar Cadastro
+      <button 
+        type="submit" 
+        [disabled]="isLoading() || !this.userData.termos"
+        class="btn-primary">
+        {{ isLoading() ? 'Criando conta...' : 'Finalizar Cadastro' }}
       </button>
 
       <div class="auth-footer">

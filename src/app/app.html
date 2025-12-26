@@ -2,7 +2,8 @@
   <router-outlet></router-outlet>
 </div>
 
-<div class="app-layout" *ngIf="!isAuthRoute"> <aside class="sidebar">
+<div class="app-layout" *ngIf="!isAuthRoute"> 
+  <aside class="sidebar">
     <div class="logo">
       <span class="logo-icon">S</span>
       <span class="logo-text">ZERO LOSS</span>
@@ -11,6 +12,9 @@
     <nav class="menu">
       <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
         <span class="icon">📊</span> Dashboard
+      </a>
+      <a routerLink="/products" routerLinkActive="active" class="menu-item">
+        <span class="icon">📦</span> Meus Produtos
       </a>
       <a routerLink="/analisador" routerLinkActive="active" class="menu-item">
         <span class="icon">💰</span> Analisador de Lucro
@@ -24,12 +28,24 @@
       
       <div class="user-box" (click)="toggleUserMenu($event)">
         <div class="store-info">
-          <span class="name">Minha Loja Oficial</span>
+          <span class="name">{{ userData()?.shop_name || 'Minha Loja' }}</span>
           <span class="status">● Online</span>
         </div>
-        <div class="avatar">ML</div>
+
+        <div class="avatar">
+          {{ userData()?.name?.substring(0, 2).toUpperCase() || 'US' }}
+        </div>
 
         <div class="profile-dropdown" [class.active]="isMenuOpen">
+          <div class="user-info-display" style="padding: 10px; font-size: 12px; border-bottom: 1px solid #eee;">
+            <strong>{{ userData()?.name }}</strong><br>
+            <span style="color: #888;">{{ userData()?.email }}</span>
+          </div>
+
+          <a routerLink="/tax-settings" class="dropdown-item">
+            <span class="icon">⚙️</span> Configurações Fiscais
+          </a>
+          <hr>
           <a routerLink="/profile" class="dropdown-item">
             <span class="icon">👤</span> Perfil
           </a>

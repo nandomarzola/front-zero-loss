@@ -1,25 +1,41 @@
-import { Component, ViewEncapsulation, HostListener } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation, HostListener } from '@angular/core';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '@core/services/auth.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule], 
   templateUrl: './app.html',
   styleUrl: './app.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class App {
-  isMenuOpen = false;
+export class App implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  userData = this.authService.user; 
+  
+  isMenuOpen = false; 
   isAuthRoute = false;
 
-  constructor(private router: Router) {
+  @HostListener('document:click')
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
+
+  ngOnInit() {
+    this.isMenuOpen = false;
+
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      const url = event.urlAfterRedirects;
-      this.isAuthRoute = url.includes('/register') || url.includes('/login');
+      this.isMenuOpen = false;
+
+      const url = event.urlAfterRedirects || this.router.url;
+      this.isAuthRoute = url.includes('/login') || url.includes('/register');
     });
   }
 
@@ -28,12 +44,8 @@ export class App {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  @HostListener('document:click')
-  closeMenu() {
-    this.isMenuOpen = false;
-  }
-
   logout() {
-    console.log('Executando logout...');
+    this.isMenuOpen = false;
+    this.authService.logout();
   }
 }

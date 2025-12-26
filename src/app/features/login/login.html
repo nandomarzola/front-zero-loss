@@ -10,11 +10,11 @@
       <div class="input-group">
         <label>E-mail</label>
         <input 
-          type="email" 
-          [(ngModel)]="loginData.email" 
-          name="email" 
+          type="identifier" 
+          [(ngModel)]="loginData.identifier" 
+          name="identifier" 
           required 
-          placeholder="seu@email.com">
+          placeholder="digite seu email ou cnpj">
       </div>
 
       <div class="input-group">
@@ -42,8 +42,11 @@
         </label>
       </div>
 
-      <button type="submit" class="btn-login" [disabled]="!loginForm.valid">
-        Entrar no Painel
+      <button 
+        type="submit" 
+        [disabled]="isLoading()"
+        class="btn-login">
+        {{ isLoading() ? 'Entrando...' : 'Entrar na Painel' }}
       </button>
 
       <div class="auth-footer">

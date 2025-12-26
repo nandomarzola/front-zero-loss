@@ -1,0 +1,56 @@
+<div class="settings-container">
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Configurações Fiscais</h1>
+      <p>Ajuste as taxas para que o cálculo de lucro seja o mais preciso possível.</p>
+    </div>
+  </header>
+
+  <div class="card settings-card" *ngIf="!isLoading()">
+    <div class="platform-selector">
+      <div class="platform-item active">
+        <span class="icon">🧡</span> Shopee
+      </div>
+      <div class="platform-item disabled">
+        <span class="icon">💙</span> Mercado Livre (Breve)
+      </div>
+    </div>
+
+    <div class="settings-grid">
+      <div class="section">
+        <h3>Taxas da Plataforma</h3>
+        <div class="input-group">
+          <label>Comissão do Marketplace (%)</label>
+          <input type="number" [(ngModel)]="config().commission_rate" placeholder="Ex: 20">
+        </div>
+        <div class="input-group">
+          <label>Taxa Fixa por Item (R$)</label>
+          <input type="number" [(ngModel)]="config().fixed_fee" placeholder="Ex: 4.00">
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Impostos e Operação</h3>
+        <div class="input-group">
+          <label>Imposto / Simples Nacional (%)</label>
+          <input type="number" [(ngModel)]="config().tax_rate" placeholder="Ex: 6.0">
+        </div>
+        <div class="input-group">
+          <label>Custo de Embalagem/Insumos (R$)</label>
+          <input type="number" [(ngModel)]="config().packaging_cost" placeholder="Ex: 1.20">
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-save" (click)="save()" [disabled]="isSaving()">
+        {{ isSaving() ? 'Salvando...' : '💾 Salvar Configurações' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando configurações...</p>
+  </div>
+</div>

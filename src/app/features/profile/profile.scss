@@ -63,4 +63,26 @@
       }
     }
   }
+  .password-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    input {
+      flex: 1;
+    }
+
+    .toggle-icon-btn {
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      outline: none;
+      
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
 }

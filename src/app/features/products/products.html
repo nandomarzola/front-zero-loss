@@ -1,0 +1,94 @@
+<div class="products-container">
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Meus Produtos</h1>
+      <p>Gerencie preços e custos da sua base local.</p>
+    </div>
+    <div class="action-group">
+      <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept=".xlsx">
+      <button class="btn-import" (click)="fileInput.click()">📁 Importar Planilha</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="custom-table" *ngIf="products().length > 0 && !isLoading()">
+        <thead>
+          <tr>
+            <th>PRODUTO / VARIAÇÃO</th>
+            <th class="text-center">ESTOQUE</th>
+            <th class="text-center">VENDA UNIT.</th>
+            <th class="text-center">CMV UNIT. (Custo)</th>
+            <th class="text-center">LUCRO LÍQUIDO</th> <th class="text-center">MARGEM</th>
+            <th class="text-center">AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of products()">
+            <td>
+              <div class="prod-title">{{ item.product_name }}</div>
+              <div class="prod-sub">{{ item.variation_name || 'Único' }}</div>
+            </td>
+            <td class="text-center">
+              <input 
+                type="number" 
+                [(ngModel)]="item.stock" 
+                (input)="recalcularItem(item)"
+                (blur)="salvarAlteracoes(item)" 
+                class="table-input"
+                style="width: 70px; font-weight: bold; text-align: center;">
+            </td>
+            
+            <td class="text-center">
+              <input 
+                type="number" 
+                [(ngModel)]="item.sale_price" 
+                (input)="recalcularItem(item)" 
+                (blur)="salvarAlteracoes(item)" 
+                class="table-input blue">
+            </td>
+
+            <td class="text-center">
+              <input 
+                type="number" 
+                [(ngModel)]="item.cost_price" 
+                (input)="recalcularItem(item)" 
+                (blur)="salvarAlteracoes(item)" 
+                class="table-input orange">
+            </td>
+
+            <td class="text-center green bold">
+              {{ (item.sale_price * (item.margin_percentage / 100)) | currency:'BRL' }}
+            </td>
+
+            <td class="text-center">
+              <span class="margin-badge" [style.background]="getMargemColor(item.margin_percentage)">
+                {{ item.margin_percentage | number:'1.1-1' }}%
+              </span>
+            </td>
+
+            <td class="text-center">
+              <button [routerLink]="['/analisador', item.id]" class="btn-icon">💰 Detalhar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando sua base de produtos...</p>
+    </div>
+
+    <div *ngIf="products().length === 0 && !isLoading()" class="empty-state">
+      <div class="empty-content">
+        <div class="icon-box">📦</div>
+        <h3>Sua lista está vazia</h3>
+        <p>Importe a planilha de "Performance do Produto" da Shopee para começar a gerenciar seus custos.</p>
+        <button class="btn-import mt-3" (click)="fileInput.click()">
+          📁 Selecionar Arquivo CSV
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

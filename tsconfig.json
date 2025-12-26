@@ -14,6 +14,7 @@
     "module": "preserve",
     "baseUrl": "./",
     "paths": {
+      "@env/*": ["src/environments/*"],
       "@core/*": ["src/app/core/*"],
       "@models/*": ["src/app/core/models/*"],
       "@services/*": ["src/app/core/services/*"]
