@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '@core/models/products';
 import { ProductService } from '@core/services/product.service';
+import * as XLSX from 'xlsx'; // Importamos para validar o arquivo antes de enviar
 
 @Component({
   selector: 'app-products',
@@ -25,56 +26,30 @@ export class Products implements OnInit {
     this.loadInitialData();
   }
 
-  /**
-   * Carrega primeiro as taxas e depois os produtos para garantir
-   * que o cálculo de margem tenha os dados necessários.
-   */
   loadInitialData() {
     this.isLoading.set(true);
-    
     this.taxService.get('shopee').subscribe({
       next: (response) => {
         this.taxConfig.set(response.data);
         this.loadProducts();
       },
       error: (err) => {
-        console.error('Erro ao carregar configurações de taxas:', err);
+        console.error('Erro ao carregar taxas:', err);
         this.loadProducts(); 
       }
     });
-  }
-
-  /**
-   * Realiza o cálculo dinâmico baseado no TaxConfiguration vindo do banco.
-   */
-  recalcularItem(item: Product) {
-    const config = this.taxConfig();
-    
-    if (!item.sale_price || item.sale_price <= 0 || !config) {
-      item.margin_percentage = 0;
-      item.margin_amount = 0;
-      return;
-    }
-
-    const comissao = item.sale_price * (config.commission_rate / 100);
-    const imposto = item.sale_price * (config.tax_rate / 100);
-    
-    const custosFixos = Number(config.fixed_fee) + Number(config.packaging_cost);
-    
-    const custoAquisicao = Number(item.cost_price || 0);
-
-    const lucroUnitario = item.sale_price - (comissao + imposto + custosFixos + custoAquisicao);
-    
-    item.margin_percentage = (lucroUnitario / item.sale_price) * 100;
-    item.margin_amount = lucroUnitario * (item.stock || 0);
   }
 
   loadProducts() {
     this.isLoading.set(true);
     this.productService.getProducts().subscribe({
       next: (response: any) => {
-        const productsList = response.data || response || [];      
+        let productsList: Product[] = response.data || response || [];      
         
+        // REGRA DE OURO: Filtrar produtos "Pai" que podem ter vindo do banco por erro anterior
+        // Se o produto tem variação vazia/Single SKU, mas existem outros produtos com o mesmo nome e variações reais, removemos o pai.
+        productsList = this.filterParentProducts(productsList);
+
         productsList.forEach((item: Product) => {
           this.recalcularItem(item);
         });
@@ -83,15 +58,73 @@ export class Products implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Erro ao carregar produtos:', err);
         this.isLoading.set(false);
       }
     });
   }
 
+  /**
+   * Remove da lista produtos que são apenas "cabeçalhos" (pais) 
+   * quando existem variações reais para aquele mesmo nome.
+   */
+  private filterParentProducts(list: Product[]): Product[] {
+    const namesWithVariations = new Set(
+      list
+        .filter(p => p.variation_name && p.variation_name !== 'Single SKU' && p.variation_name !== '-')
+        .map(p => p.product_name)
+    );
+
+    return list.filter(p => {
+      const isParent = !p.variation_name || p.variation_name === 'Single SKU' || p.variation_name === '-';
+      const hasChildren = namesWithVariations.has(p.product_name);
+      return !(isParent && hasChildren); // Retorna falso se for pai E tiver filhos
+    });
+  }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    this.isLoading.set(true);
+
+    // Dica: Você pode implementar aqui uma pré-leitura com XLSX para avisar
+    // ao usuário se ele está tentando subir algo inválido, mas o ideal
+    // é que o importProducts no service já lide com o FormData.
+    
+    this.productService.importProducts(file).subscribe({
+      next: () => {
+        event.target.value = ''; 
+        this.loadProducts(); // Recarrega a lista já aplicando o filtro acima
+      },
+      error: (err) => {
+        console.error('Erro na importação:', err);
+        this.isLoading.set(false);
+        alert('Erro ao importar planilha.');
+      }
+    });
+  }
+
+  recalcularItem(item: Product) {
+    const config = this.taxConfig();
+    if (!item.sale_price || item.sale_price <= 0 || !config) {
+      item.margin_percentage = 0;
+      item.margin_amount = 0;
+      return;
+    }
+
+    const comissao = Number(item.sale_price) * (config.commission_rate / 100);
+    const imposto = Number(item.sale_price) * (config.tax_rate / 100);
+    const custosFixos = Number(config.fixed_fee) + Number(config.packaging_cost);
+    const custoAquisicao = Number(item.cost_price || 0);
+
+    const lucroUnitario = item.sale_price - (comissao + imposto + custosFixos + custoAquisicao);
+    
+    item.margin_percentage = (lucroUnitario / item.sale_price) * 100;
+    item.margin_amount = lucroUnitario * (item.stock || 0);
+  }
+
   salvarAlteracoes(item: Product) {
     this.recalcularItem(item);
-
     this.productService.updateProduct(item.id, {
       sale_price: item.sale_price,
       cost_price: item.cost_price,
@@ -99,27 +132,9 @@ export class Products implements OnInit {
       margin_amount: item.margin_amount,
       margin_percentage: item.margin_percentage
     }).subscribe({
-      next: () => console.log(`Produto ${item.id} atualizado com sucesso!`),
-      error: (err) => alert('Erro ao salvar alterações.')
+      next: () => console.log('Atualizado!'),
+      error: () => alert('Erro ao salvar.')
     });
-  }
-
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.isLoading.set(true);
-      this.productService.importProducts(file).subscribe({
-        next: () => {
-          event.target.value = ''; 
-          this.loadProducts();
-        },
-        error: (err) => {
-          console.error('Erro na importação:', err);
-          this.isLoading.set(false);
-          alert('Erro ao importar planilha.');
-        }
-      });
-    }
   }
 
   getMargemColor(margem: number): string {

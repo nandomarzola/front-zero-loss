@@ -1,0 +1,94 @@
+<div class="analyzer-container">
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Analisador de Marketplace</h1>
+      <p>Análise de lucro em tempo real baseada nas taxas da API.</p>
+    </div>
+    
+    <div class="action-group">
+      <input type="file" (change)="onFileUpload($event)" id="file" style="display:none">
+      <label for="file" class="btn-import">📁 Importar Planilha</label>
+
+      <button 
+        *ngIf="isMonthlyClosing() && products().length > 0" 
+        (click)="fecharMes()"
+        class="btn-closing">
+        <span class="icon">🔒</span> Fechar Mês: {{ closingMonthName() }}
+      </button>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="card">
+      <label class="label-head">📦 Total de Itens Vendidos</label>
+      <div class="value-display">{{ totalItemsSold }}</div>
+    </div>
+
+    <div class="card">
+      <label class="label-head">💰 Faturamento Bruto</label>
+      <div class="value-display">{{ totalRevenue | currency:'BRL' }}</div>
+    </div>
+
+    <div class="card highlight">
+      <label class="label-head">💵 Lucro Líquido Final</label>
+      <div class="value-display white">{{ totalProfit | currency:'BRL' }}</div>
+    </div>
+    
+    <div class="card">
+      <label class="label-head">📈 Margem Líquida Média</label>
+      <div class="value-display" [style.color]="getMarginColor((totalProfit / totalRevenue) * 100)">
+        {{ (totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0) | number:'1.1-2' }}%
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>PRODUTO / VARIAÇÃO</th>
+          <th class="text-center">QTD</th>
+          <th class="text-center">PREÇO VENDA (UN)</th>
+          <th class="text-center">CUSTO COMPRA (UN)</th>
+          <th class="text-center">LUCRO (UN)</th>
+          <th class="text-right">LUCRO TOTAL</th>
+          <th class="text-center">MARGEM</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of products(); track item.id) {
+          <tr>
+            <td>
+              <div class="prod-title">{{ item.product_name }}</div>
+              <div class="prod-sub">{{ item.variation_name || 'Único' }}</div>
+            </td>
+            <td class="text-center bold">{{ item.stock }}</td>
+            <td class="text-center">
+              <input type="number" [(ngModel)]="item.sale_price" (input)="calculateFinancials()" class="table-input blue">
+            </td>
+            <td class="text-center">
+              <input type="number" [(ngModel)]="item.cost_price" (input)="onCostChange(item)" class="table-input orange">
+            </td>
+            <td class="text-center green bold">
+              {{ (item.margin_amount / (item.stock || 1)) | currency:'BRL' }}
+            </td>
+            <td class="text-right bold" [style.color]="item.margin_amount >= 0 ? '#10b981' : '#ef4444'">
+              {{ item.margin_amount | currency:'BRL' }}
+            </td>
+            <td class="text-center">
+              <span class="margin-badge" [style.background]="getMarginColor(item.margin_percentage)">
+                {{ item.margin_percentage | number:'1.1-1' }}%
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center empty-msg">
+              Nenhum dado carregado. Por favor, importe uma planilha para começar.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
